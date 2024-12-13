@@ -32,7 +32,7 @@ Single-cell multi-omics data analysis pipeline for defining the subclone archite
  3. Extracted the epithelial cell and selected the G0/G1 phase cells
  ```
  Rscript epi_subset_scRNA.R
- Rscript  split_Gphase_scRNA.R
+ Rscript split_Gphase_scRNA.R
  ```
  
 ## Integration analysis 
