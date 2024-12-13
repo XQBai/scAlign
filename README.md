@@ -16,10 +16,10 @@ Single-cell multi-omics data analysis pipeline for defining the subclone archite
 ## scRNA-seq analysis: 
  1. Cell and gene quality control for each sample by Seurat
  ```
- Rscript Seurat_scRNA.R -m './example/P5931/scRNA/P5931_normal_1/outs/filtered_feature_bc_matrix/' -p 'P5931_normal_1'
- Rscript Seurat_scRNA.R -m './example/P5931/scRNA/P5931_normal_2/outs/filtered_feature_bc_matrix/' -p 'P5931_normal_2'
- Rscript Seurat_scRNA.R -m './example/P5931/scRNA/P5931_tumor_1/outs/filtered_feature_bc_matrix/' -p 'P5931_tumor_1'
- Rscript Seurat_scRNA.R -m './example/P5931/scRNA/P5931_tumor_2/outs/filtered_feature_bc_matrix/' -p 'P5931_tumor_2'
+ Rscript Seurat_scRNA.R -m './example/P5931/scRNA/P5931_normal_1/outs/filtered_feature_bc_matrix/' -p 'P5931_normal_1' -r './example/10x_multiplet_rate.csv'
+ Rscript Seurat_scRNA.R -m './example/P5931/scRNA/P5931_normal_2/outs/filtered_feature_bc_matrix/' -p 'P5931_normal_2' -r './example/10x_multiplet_rate.csv'
+ Rscript Seurat_scRNA.R -m './example/P5931/scRNA/P5931_tumor_1/outs/filtered_feature_bc_matrix/' -p 'P5931_tumor_1' -r './example/10x_multiplet_rate.csv'
+ Rscript Seurat_scRNA.R -m './example/P5931/scRNA/P5931_tumor_2/outs/filtered_feature_bc_matrix/' -p 'P5931_tumor_2' -r './example/10x_multiplet_rate.csv'
  ```
  
  2. Merged normal and tumor objects
