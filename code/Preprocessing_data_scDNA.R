@@ -6,20 +6,24 @@ library(mixtools)
 library(optparse)
 library(future)
 
-options(future.globals.maxSize = 24000 * 1024^2)
-plan('multiprocess', workers=24)
+option_list = list(
+  make_option(c("-p", "--project_path"), action="store", default=NA, type='character',
+              help="Project name, default= sample name")
+)
+opt = parse_args(OptionParser(option_list=option_list))
 
-## The folder which scDNA-seq matrix located 
-project_path <- '../example/P5931/scDNA'
+# 
+# ## The folder which scDNA-seq matrix located 
+# project_path <- '../example/P5931/scDNA'
 
 # input the bins genome reference
-genome_reference <- fread(file.path(project_path, 'GRCh38_cellranger_20k.canonical.rownumbers.bed'), header=F, data.table=F)
+genome_reference <- fread(file.path(opt$project_path, 'GRCh38_cellranger_20k.canonical.rownumbers.bed'), header=F, data.table=F)
 
 # input the cells by bins matrix 
-scdna_matrix <- fread(file.path(project_path, 'P5931_801_tumor.tsv'))
+scdna_matrix <- fread(file.path(opt$project_path, 'P5931_801_tumor.tsv'))
 
 # input the cell barcode list 
-barcodes <- read.csv(file.path(project_path, 'P5931_801_tumor.barcodes.txt'), sep='\n', header = FALSE)
+barcodes <- read.csv(file.path(opt$project_path, 'P5931_801_tumor.barcodes.txt'), sep='\n', header = FALSE)
 colnames(scdna_matrix) <- as.character(barcodes$V1)
 
 # number of 20kb bins, the convert the neighborhood 
@@ -46,7 +50,7 @@ scdna_matrix_merge$bin <- NULL
 row.names(scdna_matrix_merge) <- paste0('segement', 1:dim(scdna_matrix_merge)[1])
 # Run Seurat to initial merged data 
 dims.reduce <- 50
-seurat_scDNA <- CreateSeuratObject(counts = as.matrix(scdna_matrix_merge), project='seurat-v3', min.cells = -Inf, min.features = -Inf)
+seurat_scDNA <- CreateSeuratObject(counts = as.matrix(scdna_matrix_merge), project='seurat-v4', min.cells = -Inf, min.features = -Inf)
 
 seurat_scDNA <- seurat_scDNA %>% ScaleData(do.center=F, do.scale = F) %>% RunPCA(verbose=T, features=rownames(seurat_scDNA)) %>% RunUMAP(umap.method = 'uwot',n.neighbors = min(20, ncol(seurat_scDNA)), dims=1:dims.reduce) %>% 
   FindNeighbors(reduction='umap', dims=1:2)
@@ -60,9 +64,5 @@ saveRDS(scdna_matrix_merge_allbarcodes, file='scdna_matrix_all_barcodes.rds')
 saveRDS(scdna_matrix_locs, file='scdna_matrix_locs.rds')
 # The seurat object
 saveRDS(seurat_scDNA, file='seurat_scDNA.rds')
-
-
-
-
 
 
