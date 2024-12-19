@@ -10,8 +10,8 @@ Download gastric cancer sample P5931 scDNA-seq and scRNA-seq data from [P5931](h
  3. Constructed subclones 
  
  ```
- Rscript Preprocessing_data_scDNA.R
- Rscript run_pipeline_scDNA.R
+ Rscript Preprocessing_data_scDNA.R -p './example/P5931/scDNA/'
+ Rscript run_pipeline_scDNA.R -p './example/P5931/scDNA/'
  Rscript Plot_umap_scDNA.R
  Rscript Plot_evolution_scDNA.R
  Rscript Plot_subclones_heatmap_scDNA.R
