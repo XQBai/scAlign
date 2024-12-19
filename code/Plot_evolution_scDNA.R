@@ -28,7 +28,7 @@ tmp_matrix <- t(round(tmp_matrix))
 rownames(tmp_matrix) <- ident
 tmp_matrix <- tmp_matrix[sort(as.character(ident)), ]
 
-dist <- dist(tmp_matrix)
+dist <- stats::dist(tmp_matrix)
 
 # Construct hierarchical clusters for subclones
 hc <- hclust(dist)
