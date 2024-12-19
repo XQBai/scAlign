@@ -12,15 +12,15 @@ library(GenomicRanges)
 library(RColorBrewer)
 
 
-options(future.globals.maxSize = 24000 * 1024^2)
-plan('multiprocess', workers=24)
-
-# project_path <- '../example/P5931/scDNA'
-# scdna_matrix_locs <- readRDS('scdna_matrix_locs.rds')
-# seurat_scDNA <- readRDS('seurat_scDNA.rds')
-
-## read the cell metrics file conducted by cellranger-dna
-per_cell_metrics <- read.csv(file.path(project_path, 'per_cell_summary_metrics.csv'), sep=",", header=T)
+# options(future.globals.maxSize = 24000 * 1024^2)
+# plan('multiprocess', workers=24)
+# 
+# # project_path <- '../example/P5931/scDNA'
+# # scdna_matrix_locs <- readRDS('scdna_matrix_locs.rds')
+# # seurat_scDNA <- readRDS('seurat_scDNA.rds')
+# 
+# ## read the cell metrics file conducted by cellranger-dna
+# per_cell_metrics <- read.csv(file.path(project_path, 'per_cell_summary_metrics.csv'), sep=",", header=T)
 
 # Identify the cellranger noise cells by cellranger metrics 
 Identify_cellranger_noise <- function(per_cell_metrics, seurat_scDNA){
@@ -110,7 +110,7 @@ Identify_replicates <- function(seurat_scDNA, scdna_matrix_locs){
   # subset the object with tumor cells
   seurat_scDNA_tumor <- subset(seurat_scDNA, cells = which(celltype == 'tumor'))
   # Filter the genome segments on chromosome X and Y
-  locs <- scdna_matrix_locs %>% filter(chr != 'chrX' & chr != 'chrY')
+  locs <- scdna_matrix_locs %>% dplyr::filter(chr != 'chrX' & chr != 'chrY')
   
   mat <- seurat_scDNA_tumor@assays$RNA@counts[1:length(locs$chr), ]
   
