@@ -9,23 +9,17 @@ library(ggplot2)
 library(mixtools)
 library(GenomicRanges)
 
+source('/mnt/ix1/Projects/M070_200622_GI_multiomics/GithubCode_202411/code/Plot_all_chr_heatmap_latest.R', echo=TRUE)
 
-options(future.globals.maxSize = 6000*1024^2)
-plan('multiprocess', workers = 12)
-
-source('Plot_all_chr_heatmap_latest.R', echo=TRUE)
-
-# load('scdna_matrix_locs.Robj')
-# load('seurat_scDNA.Robj')
-# hc <- readRDS('hc.rds')
-# hc_no_normal <- readRDS('hc_no_normal.rds')
+seurat_scDNA <- readRDS('seurat_scDNA.rds')
+scdna_matrix_locs <- readRDS('scdna_matrix_locs.rds')
 
 scdna_matrix_merge <- as.data.frame(seurat_scDNA@assays$RNA@counts)
 scdna_matrix_merge$chr <- scdna_matrix_locs$chr
 
-scdna_matrix_merge <- scdna_matrix_merge %>% filter(chr != 'chrX' & chr != 'chrY') 
+scdna_matrix_merge <- scdna_matrix_merge %>% dplyr::filter(chr != 'chrX' & chr != 'chrY') 
 scdna_matrix_merge$chr <- NULL
-scdna_matrix_locs <- scdna_matrix_locs %>% filter(chr != 'chrX' & chr != 'chrY') 
+scdna_matrix_locs <- scdna_matrix_locs %>% dplyr::filter(chr != 'chrX' & chr != 'chrY') 
 
 sum_row <- apply(scdna_matrix_merge, 1, mean)
 row_index <- which(sum_row != 0)
@@ -35,8 +29,8 @@ scdna_matrix_locs <- scdna_matrix_locs[row_index, ]
 scdna_matrix_merge$chr <- scdna_matrix_locs$chr
 scdna_matrix_merge$bin <- scdna_matrix_locs$bin
 
-scdna_matrix_merge <- scdna_matrix_merge %>% arrange(bin)
-scdna_matrix_locs <- scdna_matrix_locs %>% arrange(bin)
+scdna_matrix_merge <- scdna_matrix_merge %>% dplyr::arrange(bin)
+scdna_matrix_locs <- scdna_matrix_locs %>% dplyr::arrange(bin)
 
 scdna_matrix_merge$chr <- NULL
 scdna_matrix_merge$bin <- NULL
@@ -85,7 +79,9 @@ mat.no.normal[mat.no.normal > 6] = 6
 label.no.normal <- rep(names(table(seurat.no.normal$subclones)), table(seurat.no.normal$subclones))
 label.no.normal <- data.frame(cluster=label.no.normal)
 
+
 if(length(unique(label.no.normal$cluster)) > 1){
+  hc_no_normal <- readRDS('hc_no_normal.rds')
   obj <- Sort_subclones(mat.no.normal, label.no.normal, hc_no_normal)
   mat.no.normal <- obj[[1]]
   label.no.normal <- obj[[2]]
@@ -109,6 +105,7 @@ mat.normal[mat.normal > 6] = 6
 
 label.normal <- rep(names(table(seurat.normal$subclones)), table(seurat.normal$subclones))
 label.normal <- data.frame(cluster=label.normal)
+hc <- readRDS('hc.rds')
 obj <- Sort_subclones(mat.normal, label.normal, hc)
 mat.normal <- obj[[1]]
 labels.normal <- obj[[2]]
