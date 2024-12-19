@@ -10,12 +10,15 @@ library(pracma)
 library(stringr)
 library(ini) 
 library(DoubletFinder)
+library(viridis)
 
 option_list = list(
   make_option(c("-m", "--fn_prefix"), action="store", default=NA, type='character',
               help="Prefix for cellranger matrix file (<mprefix>.matrix.mtx)"), 
   make_option(c("-p", "--sample"), action="store", default=NA, type='character',
-              help="Project name, default= sample name")
+              help="Project name, default= sample name"),
+  make_option(c('-r', "--multiplet_rate", action='store', default = NA, type='character',
+                help='10X multiplet rate table, default = 10x_multiplet_rate.csv'))
 )
 opt = parse_args(OptionParser(option_list=option_list))
 
@@ -151,7 +154,7 @@ pk_val= as.numeric(tmp[1,2])
 # pK (PC neighborhood size as a proportion of merged real-artificial data); from find.pK above
 #two thresholds for doublets based on cell loading and homotypic doublets. First with cell loading
 #only cell loading used
-cell_loading <- read.csv('../example/10x_multiplet_rate.csv')
+cell_loading <- read.csv(opt$multiplet_rate)
 seurat_nr_cells = length(Idents(seurat_umap))
 doublet_rate_for_seurat_cells <- cell_loading[which(abs(cell_loading$cells_recovered-seurat_nr_cells)==min(abs(cell_loading$cells_recovered-seurat_nr_cells))),]
 droplet_doublet_rate <- doublet_rate_for_seurat_cells[1,1]
