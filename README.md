@@ -2,8 +2,8 @@
 
 Single-cell multi-omics data analysis pipeline for defining the subclone architecture and clonal phenotype from the primary gastric and metastatic colon cancers. We conducted scDNA-seq and scRNA-seq assays on thousands of single cells derived from the same specimen. We constructed the subclone architecture by scDNA-seq data and characterized the distinct large CNVs among subclones. Then we analyzed the paired scRNA-seq gene expression profile to determine cell types and transcriptome features. Utilizing both results, we assigned the scRNA-seq gene expression to subclones derived in scDNA-seq based on gene dosage effect. Finally, we identified the differential phenotype pathways among subclones by GSVA. There are three major parts included in the whole pipeline:
 
-## Download the example data P5931
-Download P5931 scDNA-seq and scRNA-seq data from [P5931](https://github.com/XQBai/Single-cell-multi-omic-integration/releases/tag/P5931)
+## Download the example data 
+Download gastric cancer sample P5931 scDNA-seq and scRNA-seq data from [P5931](https://github.com/XQBai/Single-cell-multi-omic-integration/releases/tag/P5931)
 ## scDNA-seq analysis:
  1. Cell quality control (QC)
  2. Identified cellular components 
