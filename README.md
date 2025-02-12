@@ -46,11 +46,11 @@ ScDNA-seq and scRNA-seq of all samples can be downloaded from [Ji Research Group
  Rscript scRNA_pre_processing_Integrate.R 
  Rscript Projection_alignment_Integrate.R
  ```
- 2. Evaluated the subclone assignment by inferCNV package 
+ 3. Evaluated the subclone assignment by inferCNV package 
  ```
  Rscript run_infercnv_Integrate.R
  ```
- 3. Discovered phenotype biology of subclones  
+ 4. Discovered phenotype biology of subclones  
  ```
  Rscript run_GSVA_hallmark_Integrate.R
  ```
