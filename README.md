@@ -30,7 +30,7 @@ ScDNA-seq and scRNA-seq of all samples can be downloaded from [Ji Research Group
  ```
  Rscript merge_seurat_scRNA.R
  Rscript merge_sctransform_scRNA.R
- Rscript find_markers_scRNA.R
+ Rscript find_markers_scRNA.R -r 'seurat_aggr.rds'
  ```
  
  3. Extracted the epithelial cell and selected the G0/G1 phase cells
