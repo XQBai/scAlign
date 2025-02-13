@@ -53,7 +53,7 @@ ScDNA-seq and scRNA-seq of all samples can be downloaded from [Ji Research Group
  ```
  4. Discovered phenotype biology of subclones  
  ```
- Rscript run_GSVA_hallmark_Integrate.R
+ Rscript run_pathway_Integrate.R
  ```
 ## Data
 The scDNA-seq and scRNA-seq datasets generated for this study are available in NCBI's dbGAP repositories, accession numbers phs001711 and phs001818. 
