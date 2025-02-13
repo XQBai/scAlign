@@ -43,7 +43,8 @@ ScDNA-seq and scRNA-seq of all samples can be downloaded from [Ji Research Group
  1. Normalize the gene expression of scRNA-seq in G0/G1 Phase
  2. Assigned epithelial single cells (G0G1 phase) from scRNA-seq into subclones of scDNA-seq
  ```
- Rscript scRNA_pre_processing_Integrate.R 
+ Rscript scRNA_pre_processing_Integrate.R
+ Rscript Avg_CNV_subclones.R 
  Rscript Projection_alignment_Integrate.R
  ```
  3. Evaluated the subclone assignment by inferCNV package 
