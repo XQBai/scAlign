@@ -105,14 +105,14 @@ seu_epi <- run_scalign_pipeline(
   seurat_obj,
   seu_epi,
   gene_locs_path,
-  signal_chr = c(3, 7, 8, 21),
+  signal_chr = c(3, 7, 8, 21), # define signal_chr parameter according to chromosomes with significant CNV changes of scDNA-seq subclones
   output_seurat_rds = './output/scRNA/seurat_epi.rds',
   output_alignment_csv = './output/scRNA/project_alignment.csv',
   method = 'euclidean'
 )
 print(table(seu_epi$pro_alignment))
 
-# Evaluated the subclone assignment by inferCNV package
+# Evaluated the subclone assignment by the inferCNV package
 Rscript ../script/run_infercnv_Integrate.R
  ```
 ## Data
