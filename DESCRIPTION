@@ -1,6 +1,6 @@
 Package: scAlign
 Type: Package
-Title: scAlign: single-cell multi-omics integration to define subclone architecture and clonal phenotypes for scRNA & scDNA
+Title: scAlign: scAlign: Single-cell clonal alignment for integrating scRNA-seq and scDNA-seq from the same specimen.
 Version: 0.1.0
 Author: person("Xiangqi", "Bai", email = "xiangqi@stanford.edu", role = c("aut", "cre"))
 Maintainer: The package maintainer <xiangqi@stanford.edu>
