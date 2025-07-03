@@ -67,8 +67,7 @@ scdna_gene_subclones <- generate_subclone_cnv_gene_matrix(
 )
 saveRDS(scdna_gene_subclones, './output/scDNA/scdna_gene_subclones.rds')
 ```
-## scRNA-seq analysis: 
-
+## scAlign analyze scRNA-seq data
  ```
 # Seurat preprocessing each sample for quality control, doublets filtering, and cell cycle assignment
 Rscript ./script/Seurat_scRNA.R -m './data/P5931/scRNA/P5931_normal_1/outs/filtered_feature_bc_matrix/' -p 'P5931_normal_1' -r './data/10x_multiplet_rate.csv'
@@ -88,35 +87,35 @@ saveRDS(seu_epi, './output/scRNA/seurat_epi.rds')
 scrna_normalized_matrix <- run_scrna_normalization(seu_epi, gene_locs_path)
 saveRDS(scrna_normalized_matrix, './output/scRNA/RNA_normalized_matrix.rds')
  ```
- 
- 2. Merged normal and tumor objects
- ```
- Rscript merge_seurat_scRNA.R
- Rscript merge_sctransform_scRNA.R
- Rscript find_markers_scRNA.R -r 'seurat_aggr.rds'
- ```
- 
- 3. Extracted the epithelial cell and selected the G0/G1 phase cells
- ```
- Rscript epi_subset_scRNA.R
- Rscript split_Gphase_scRNA.R
- ```
- 
-## Integration analysis 
+## scAlign assigns scRNA-seq cells into subclones detected by scDNA-seq 
+
  1. Normalize the gene expression of scRNA-seq in G0/G1 Phase
  2. Assigned epithelial single cells (G0G1 phase) from scRNA-seq into subclones of scDNA-seq
  ```
- Rscript scRNA_pre_processing_Integrate.R
- Rscript Avg_CNV_subclones.R 
- Rscript Projection_alignment_Integrate.R
- ```
- 3. Evaluated the subclone assignment by inferCNV package 
- ```
- Rscript run_infercnv_Integrate.R
- ```
- 4. Discovered phenotype biology of subclones  
- ```
- Rscript run_pathway_Integrate.R
+# load inputs 
+scdna_gene_matrix <- readRDS('./output/scDNA/scdna_gene_matrix.rds')
+scrna_normalized_matrix <- readRDS('./output/scRNA/RNA_normalized_matrix.rds')
+scdna_subclones <- readRDS('./output/scDNA/scdna_gene_subclones.rds')
+seu_epi <- readRDS('./output/scRNA/seurat_epi.rds')
+seurat_obj <- readRDS('./output/scDNA/seurat_scDNA.rds')
+
+# Run scAlign integration
+seu_epi <- run_scalign_pipeline(
+  scrna_normalized_matrix,
+  scdna_gene_matrix,
+  scdna_subclones,
+  seurat_obj,
+  seu_epi,
+  gene_locs_path,
+  signal_chr = c(3, 7, 8, 21),
+  output_seurat_rds = './output/scRNA/seurat_epi.rds',
+  output_alignment_csv = './output/scRNA/project_alignment.csv',
+  method = 'euclidean'
+)
+print(table(seu_epi$pro_alignment))
+
+# Evaluated the subclone assignment by inferCNV package
+Rscript ../script/run_infercnv_Integrate.R
  ```
 ## Data
 The scDNA-seq and scRNA-seq datasets generated for this study are available in NCBI's dbGAP repositories, accession numbers phs001711 and phs001818. 
