@@ -12,7 +12,32 @@ devtools::install_github("XQBai/scAlign")
 ## Download the example data 
 Download gastric cancer sample P5931 scDNA-seq and scRNA-seq data from [P5931](https://github.com/XQBai/Single-cell-multi-omic-integration/releases/tag/P5931). 
 ScDNA-seq and scRNA-seq of all samples can be downloaded from [Ji Research Group](https://dna-discovery.stanford.edu/research/datasets/).
-## scDNA-seq analysis:
+
+## Example Workflow for sample P5931 
+```
+library(scAlign)
+library(Seurat)
+library(tidyverse)
+
+# create output directories
+dir.create('./output/scDNA', showWarnings = FALSE, recursive = TRUE)
+dir.create('./output/scRNA', showWarnings = FALSE, recursive = TRUE)
+
+# define input paths
+data_dir <- './data/P5931'
+scdna_dir <- file.path(data_dir, 'scDNA')
+scrna_dir <- file.path(data_dir, 'scRNA')
+
+genome_reference_file <- file.path(scdna_dir, 'GRCh38_cellranger_20k.canonical.rownumbers.bed')
+scdna_tsv_file <- file.path(scdna_dir, 'P5931_801_scdna_matrix.tsv')
+barcode_txt_file <- file.path(scdna_dir, 'P5931_801_tumor.barcodes.txt')
+per_cell_metrics_file <- file.path(scdna_dir, 'per_cell_summary_metrics.csv')
+genes_bin_file <- './data/genes_bin.RData'
+gene_locs_path <- './data/gene_locs.sorted.bed'
+
+```
+
+### scAlign construct subclones of scDNA-seq data:
  1. Cell quality control (QC)
  2. Identified cellular components 
  3. Constructed subclones 
