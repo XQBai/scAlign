@@ -47,15 +47,25 @@ scdna_matrix_locs <- scdna_res[[2]]
 saveRDS(scdna_matrix_merge, './output/scDNA/scdna_matrix_all_barcodes.rds')
 saveRDS(scdna_matrix_locs, './output/scDNA/scdna_matrix_locs.rds')
 
-# Identified cellular components
+# Identify cellular components
 seurat_scDNA <- create_seurat_scdna(scdna_matrix_merge, scdna_matrix_locs)
 seurat_scDNA <- identify_cellranger_noise(per_cell_metrics_file, seurat_obj = seurat_scDNA)
 seurat_scDNA <- identify_technical_noise(seurat_obj = seurat_scDNA)
 seurat_scDNA <- identify_normal_cells(seurat_scDNA, scdna_matrix_locs)
 seurat_scDNA <- identify_replication_cells(seurat_scDNA, scdna_matrix_locs)
 
-# Constructed subclones
+# Construct subclones and visualize subclones 
 seurat_scDNA <- construct_subclones(seurat_scDNA)
+plot_subclonal_heatmap(seurat_scDNA, scdna_matrix_locs, celltype = 'G0G1',
+                       output_path = './output/scDNA/G0G1_subclone_heatmap.pdf')
+# Generate gene-level subclone matrix
+scdna_gene_subclones <- generate_subclone_cnv_gene_matrix(
+  seurat_scDNA,
+  genes_bin_file,
+  scdna_tsv_file,
+  barcode_txt_file
+)
+saveRDS(scdna_gene_subclones, './output/scDNA/scdna_gene_subclones.rds')
 ```
 ## scRNA-seq analysis: 
  1. Cell and gene quality control for each sample by Seurat
