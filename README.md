@@ -58,7 +58,7 @@ seurat_scDNA <- identify_replication_cells(seurat_scDNA, scdna_matrix_locs)
 seurat_scDNA <- construct_subclones(seurat_scDNA)
 plot_subclonal_heatmap(seurat_scDNA, scdna_matrix_locs, celltype = 'G0G1',
                        output_path = './output/scDNA/G0G1_subclone_heatmap.pdf')
-# Generate gene-level subclone matrix
+# Generate gene-level subclone matrix for preparation of scAlign integration
 scdna_gene_subclones <- generate_subclone_cnv_gene_matrix(
   seurat_scDNA,
   genes_bin_file,
@@ -68,12 +68,25 @@ scdna_gene_subclones <- generate_subclone_cnv_gene_matrix(
 saveRDS(scdna_gene_subclones, './output/scDNA/scdna_gene_subclones.rds')
 ```
 ## scRNA-seq analysis: 
- 1. Cell and gene quality control for each sample by Seurat
+
  ```
- Rscript Seurat_scRNA.R -m './example/P5931/scRNA/P5931_normal_1/outs/filtered_feature_bc_matrix/' -p 'P5931_normal_1' -r './example/10x_multiplet_rate.csv'
- Rscript Seurat_scRNA.R -m './example/P5931/scRNA/P5931_normal_2/outs/filtered_feature_bc_matrix/' -p 'P5931_normal_2' -r './example/10x_multiplet_rate.csv'
- Rscript Seurat_scRNA.R -m './example/P5931/scRNA/P5931_tumor_1/outs/filtered_feature_bc_matrix/' -p 'P5931_tumor_1' -r './example/10x_multiplet_rate.csv'
- Rscript Seurat_scRNA.R -m './example/P5931/scRNA/P5931_tumor_2/outs/filtered_feature_bc_matrix/' -p 'P5931_tumor_2' -r './example/10x_multiplet_rate.csv'
+# Seurat preprocessing each sample for quality control, doublets filtering, and cell cycle assignment
+Rscript ./script/Seurat_scRNA.R -m './data/P5931/scRNA/P5931_normal_1/outs/filtered_feature_bc_matrix/' -p 'P5931_normal_1' -r './data/10x_multiplet_rate.csv'
+Rscript ./script/Seurat_scRNA.R -m './data/P5931/scRNA/P5931_normal_2/outs/filtered_feature_bc_matrix/' -p 'P5931_normal_2' -r './data/10x_multiplet_rate.csv'
+Rscript ./script/Seurat_scRNA.R -m './data/P5931/scRNA/P5931_tumor_1/outs/filtered_feature_bc_matrix/' -p 'P5931_tumor_1' -r './data/10x_multiplet_rate.csv'
+Rscript ./script/Seurat_scRNA.R -m './data/P5931/scRNA/P5931_tumor_2/outs/filtered_feature_bc_matrix/' -p 'P5931_tumor_2' -r './data/10x_multiplet_rate.csv'
+
+# Merge scRNA-seq data and subset epithelial G0/G1 cells
+rds_files <- list.files('./output/scRNA', pattern = '*seurat_dfx.rds', full.names = TRUE)
+sample_list <- list('P5931_normal_1', 'P5931_normal_2', 'P5931_tumor_1', 'P5931_tumor_2')
+condition_list <- list('normal', 'normal', 'tumor', 'tumor')
+
+seu_epi <- run_scrna_pipeline(rds_files, sample_list, condition_list)
+saveRDS(seu_epi, './output/scRNA/seurat_epi.rds')
+
+# Normalize scRNA-seq matrix for preparing input for scAlign integration
+scrna_normalized_matrix <- run_scrna_normalization(seu_epi, gene_locs_path)
+saveRDS(scrna_normalized_matrix, './output/scRNA/RNA_normalized_matrix.rds')
  ```
  
  2. Merged normal and tumor objects
