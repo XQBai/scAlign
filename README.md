@@ -67,7 +67,7 @@ scdna_gene_subclones <- generate_subclone_cnv_gene_matrix(
 )
 saveRDS(scdna_gene_subclones, './output/scDNA/scdna_gene_subclones.rds')
 ```
-## scAlign analyze scRNA-seq data
+### scAlign analyze scRNA-seq data
  ```
 # Seurat preprocessing each sample for quality control, doublets filtering, and cell cycle assignment
 Rscript ./script/Seurat_scRNA.R -m './data/P5931/scRNA/P5931_normal_1/outs/filtered_feature_bc_matrix/' -p 'P5931_normal_1' -r './data/10x_multiplet_rate.csv'
@@ -87,10 +87,8 @@ saveRDS(seu_epi, './output/scRNA/seurat_epi.rds')
 scrna_normalized_matrix <- run_scrna_normalization(seu_epi, gene_locs_path)
 saveRDS(scrna_normalized_matrix, './output/scRNA/RNA_normalized_matrix.rds')
  ```
-## scAlign assigns scRNA-seq cells into subclones detected by scDNA-seq 
-
- 1. Normalize the gene expression of scRNA-seq in G0/G1 Phase
- 2. Assigned epithelial single cells (G0G1 phase) from scRNA-seq into subclones of scDNA-seq
+### scAlign assigns scRNA-seq cells into subclones detected by scDNA-seq 
+Assigned epithelial single cells (G0G1 phase) from scRNA-seq into subclones of scDNA-seq
  ```
 # load inputs 
 scdna_gene_matrix <- readRDS('./output/scDNA/scdna_gene_matrix.rds')
