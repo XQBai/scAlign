@@ -2,6 +2,13 @@
 
 scAlign: Single-cell clonal alignment for integrating scRNA-seq and scDNA-seq from the same specimen. scAlign is a single-cell multi-omics integration framework designed to resolve clonal architecture and phenotypic diversity. First, scAlign constructs subclone architecture using scDNA-seq data and characterizes large-scale copy number variations across subclones. Second, it assigns scRNA-seq cells to matched subclones based on gene dosage effects. Overall, it enables integrated analysis of gene expression and genomic alterations to define clonal phenotypes and identify differential pathways among subclones. We applied scAlign to thousands of single cells from primary gastric cancer and metastatic colon cancer specimens, demonstrating its ability to resolve subclonal genomic structure, assign transcriptomic profiles to subclones, and characterize clonal phenotypic heterogeneity.
 
+## Installation
+
+```
+install.packages('devtools')
+devtools::install_github("XQBai/scAlign")
+```
+
 ## Download the example data 
 Download gastric cancer sample P5931 scDNA-seq and scRNA-seq data from [P5931](https://github.com/XQBai/Single-cell-multi-omic-integration/releases/tag/P5931). 
 ScDNA-seq and scRNA-seq of all samples can be downloaded from [Ji Research Group](https://dna-discovery.stanford.edu/research/datasets/).
