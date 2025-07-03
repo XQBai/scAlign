@@ -98,6 +98,7 @@ seu_epi <- readRDS('./output/scRNA/seurat_epi.rds')
 seurat_obj <- readRDS('./output/scDNA/seurat_scDNA.rds')
 
 # Run scAlign integration
+# define signal_chr parameter according to chromosomes with significant CNV changes of scDNA-seq subclones
 seu_epi <- run_scalign_pipeline(
   scrna_normalized_matrix,
   scdna_gene_matrix,
@@ -105,7 +106,7 @@ seu_epi <- run_scalign_pipeline(
   seurat_obj,
   seu_epi,
   gene_locs_path,
-  signal_chr = c(3, 7, 8, 21), # define signal_chr parameter according to chromosomes with significant CNV changes of scDNA-seq subclones
+  signal_chr = c(3, 7, 8, 21), 
   output_seurat_rds = './output/scRNA/seurat_epi.rds',
   output_alignment_csv = './output/scRNA/project_alignment.csv',
   method = 'euclidean'
@@ -117,6 +118,9 @@ Rscript ../script/run_infercnv_Integrate.R
  ```
 ## Data
 The scDNA-seq and scRNA-seq datasets generated for this study are available in NCBI's dbGAP repositories, accession numbers phs001711 and phs001818. 
+
+## Reference
+[Single-cell aneuploidy and chromosomal arm imbalances define subclones with divergent transcriptomic phenotypes, under revision]
 <!--
 ## Reference
 [Single cell multi-omic mapping of subclonal architecture and pathway phenotype in primary gastric and metastatic colon cancers, bioRxiv](https://www.biorxiv.org/content/10.1101/2022.07.03.498616v1)
