@@ -120,11 +120,12 @@ Rscript ../script/run_infercnv_Integrate.R
 The scDNA-seq and scRNA-seq datasets generated for this study are available in NCBI's dbGAP repositories, accession numbers phs001711 and phs001818. 
 
 ## Reference
-[Single-cell aneuploidy and chromosomal arm imbalances define subclones with divergent transcriptomic phenotypes, under revision]
+Single-cell aneuploidy and chromosomal arm imbalances define subclones with divergent transcriptomic phenotypes, under revision
+
 <!--
 ## Reference
 [Single cell multi-omic mapping of subclonal architecture and pathway phenotype in primary gastric and metastatic colon cancers, bioRxiv](https://www.biorxiv.org/content/10.1101/2022.07.03.498616v1)
 -->
 
 ## Contact 
-### xiangqi@stanford.edu 
+xiangqi@stanford.edu 
