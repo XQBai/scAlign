@@ -38,17 +38,25 @@ gene_locs_path <- './data/gene_locs.sorted.bed'
 ```
 
 ### scAlign construct subclones of scDNA-seq data:
- 1. Cell quality control (QC)
- 2. Identified cellular components 
- 3. Constructed subclones 
- 
- ```
- Rscript Preprocessing_data_scDNA.R -p './example/P5931/scDNA/'
- Rscript run_pipeline_scDNA.R -p './example/P5931/scDNA/'
- Rscript Plot_umap_scDNA.R
- Rscript Plot_evolution_scDNA.R
- Rscript Plot_subclones_heatmap_scDNA.R
- ```
+```
+# merge genome bins as 1MB segments
+scdna_res <- scdna_preprocessing(genome_reference_file, scdna_tsv_file, barcode_txt_file)
+scdna_matrix_merge <- scdna_res[[1]]
+scdna_matrix_locs <- scdna_res[[2]]
+
+saveRDS(scdna_matrix_merge, './output/scDNA/scdna_matrix_all_barcodes.rds')
+saveRDS(scdna_matrix_locs, './output/scDNA/scdna_matrix_locs.rds')
+
+# Identified cellular components
+seurat_scDNA <- create_seurat_scdna(scdna_matrix_merge, scdna_matrix_locs)
+seurat_scDNA <- identify_cellranger_noise(per_cell_metrics_file, seurat_obj = seurat_scDNA)
+seurat_scDNA <- identify_technical_noise(seurat_obj = seurat_scDNA)
+seurat_scDNA <- identify_normal_cells(seurat_scDNA, scdna_matrix_locs)
+seurat_scDNA <- identify_replication_cells(seurat_scDNA, scdna_matrix_locs)
+
+# Constructed subclones
+seurat_scDNA <- construct_subclones(seurat_scDNA)
+```
 ## scRNA-seq analysis: 
  1. Cell and gene quality control for each sample by Seurat
  ```
