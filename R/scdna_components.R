@@ -1,8 +1,9 @@
 utils::globalVariables(c(
-  "chr", 
-  "variable", 
-  "cell_index", 
-  "dropout_proportion"
+  "chr",
+  "variable",
+  "cell_index",
+  "dropout_proportion", 
+  "value"
 ))
 #' Create Seurat object for scDNA-seq data and perform dimensionality reduction
 #' @importFrom Seurat CreateSeuratObject SetAssayData GetAssayData
@@ -50,7 +51,7 @@ create_seurat_scdna <- function(scdna_matrix_merge,
   if (!dir.exists(output_dir)) {
     dir.create(output_dir, recursive = TRUE)
   }
-  
+
   # Save Seurat object
   saveRDS(seurat_obj, file = file.path(output_dir, output_file))
   return(seurat_obj)
@@ -139,7 +140,7 @@ identify_technical_noise <- function(seurat_obj = 'seurat_scDNA.rds',
     if (!dir.exists(output_dir)) {
       dir.create(output_dir, recursive = TRUE)
     }
-    
+
     ggsave(filename = file.path(output_dir, plot_filename), plot = p, device = "pdf", width = 8, height = 6)
   }
 
@@ -154,7 +155,7 @@ identify_technical_noise <- function(seurat_obj = 'seurat_scDNA.rds',
 
 
 #' Identify normal cells based on chromosome-wise CNV analysis
-#' @importFrom dplyr group_by summarise_all 
+#' @importFrom dplyr group_by summarise_all
 #' @importFrom magrittr %>%
 #' @importFrom reshape2 melt
 #' @param seurat_obj Seurat object with celltype annotation
@@ -206,7 +207,7 @@ identify_normal_cells <- function(seurat_obj='seurat_scDNA.rds',
   # Classify cells based on CNV threshold
   cell_classification <- chr_averages_melt %>%
     dplyr::group_by(variable) %>%
-    dplyr::summarise(is_tumor = any(chr_averages_melt$value > cnv_threshold, na.rm = TRUE))
+    dplyr::summarise(is_tumor = any(value > cnv_threshold, na.rm = TRUE))
 
   # Update celltype annotation
   seurat_obj$celltype[non_noise_indices] <- ifelse(
@@ -288,7 +289,7 @@ identify_replication_cells <- function(seurat_obj = 'seurat_scDNA.rds',
     if (!dir.exists(output_dir)) {
       dir.create(output_dir, recursive = TRUE)
     }
-    
+
     pdf(file.path(output_dir, plot_filename))
     mixtools::plot.mixEM(
       mixture_model,
