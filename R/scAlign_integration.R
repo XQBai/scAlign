@@ -97,7 +97,7 @@ run_scalign_pipeline <- function(
   if (!dir.exists(output_dir)) {
     dir.create(output_dir, recursive = TRUE)
   }
-  
+
   # Save results
   saveRDS(seu_epi, file = file.path(output_dir, output_seurat_rds))
 
@@ -166,7 +166,7 @@ assign_scrna_subclones <- function(scdna_gene_subclone, scrna_proj_matrix, metho
   if (method == "euclidean") {
     dis.mat <- apply(scdna_gene_subclone, 1, function(col1) {
       apply(scrna_proj_matrix, 1, function(col2) {
-        dist(rbind(col1,col2), method = "Euclidean")
+        dist(rbind(col1,col2), method = "euclidean")
       })
     })
     assign_clone <- unlist(apply(dis.mat, 1, function(x){which(x == min(x))}))

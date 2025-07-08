@@ -37,36 +37,36 @@ run_scrna_normalization <- function(seurat_epi, gene_locs_path, output_rds = 'RN
 
 
 #' Filter genes below mean expression cutoff
-#' @param mat Expression matrix
+#' @param data Expression matrix
 #' @param cutoff Numeric, mean expression cutoff
 #' @return Filtered matrix
 #' @export
-Filter_genes_below_mean_exp_cutoff <- function(mat, cutoff = 0.1) {
-  average_gene <- rowMeans(mat)
+Filter_genes_below_mean_exp_cutoff <- function(data, cutoff = 0.1) {
+  average_gene <- rowMeans(data)
   remain_indices <- which(average_gene > cutoff)
-  mat[remain_indices, , drop = FALSE]
+  data[remain_indices, , drop = FALSE]
 }
 
 #' Filter genes expressed in fewer than min_num_cells
-#' @param mat Expression matrix
+#' @param data Expression matrix
 #' @param min_num_cells Integer, minimum number of cells
 #' @return Filtered matrix
 #' @export
-Filter_genes <- function(mat, min_num_cells = 3) {
-  genes_exp_cn <- apply(mat, 1, function(x) sum(x > 0 & !is.na(x)))
+Filter_genes <- function(data, min_num_cells = 3) {
+  genes_exp_cn <- apply(data, 1, function(x) sum(x > 0 & !is.na(x)))
   genes_remain <- which(genes_exp_cn > min_num_cells)
   if (length(genes_remain) == 0) stop('All genes were removed.')
-  mat[genes_remain, , drop = FALSE]
+  data[genes_remain, , drop = FALSE]
 }
 
 #' Normalize counts by sequencing depth
-#' @param mat Expression matrix
+#' @param data Expression matrix
 #' @param normalize_factor Numeric, normalization factor (default: median of column sums)
 #' @return Normalized matrix
 #' @export
-normalize_counts_by_seq_depth <- function(mat, normalize_factor = NA) {
-  cs <- colSums(mat)
-  data <- sweep(mat, 2, cs, '/')
+normalize_counts_by_seq_depth <- function(data, normalize_factor = NA) {
+  cs <- colSums(data)
+  data <- sweep(data, 2, cs, '/')
   if (is.na(normalize_factor)) normalize_factor <- median(cs)
   data * normalize_factor
 }
@@ -220,9 +220,9 @@ subset_seurat_by_condition_or_phase <- function(seu, condition_value = 'tumor') 
 #' @return Normalized matrix
 #' @export
 Normalize_RNA <- function(scRNA_raw_matrix, gene_locs) {
-  mat <- Filter_genes_below_mean_exp_cutoff(scRNA_raw_matrix, 0.1)
-  mat <- Filter_genes(mat, 3)
-  mat_normalize <- normalize_counts_by_seq_depth(mat)
+  tmp_mat <- Filter_genes_below_mean_exp_cutoff(scRNA_raw_matrix, 0.1)
+  tmp_mat <- Filter_genes(tmp_mat, 3)
+  mat_normalize <- normalize_counts_by_seq_depth(tmp_mat)
   mat_log <- Logtransform(mat_normalize)
   mat_subtract <- Subtract_ref_mean_exp(mat_log)
   mat_bounds <- Max_threshold_bounds(mat_subtract, 3)
@@ -230,6 +230,6 @@ Normalize_RNA <- function(scRNA_raw_matrix, gene_locs) {
   mat_center <- Center_cells_across_chromosome(mat_smooth, method = 'median')
   mat_subtract_adj <- Subtract_ref_mean_exp(mat_center)
   mat_exp <- Invert_logtransform(mat_subtract_adj) + 1
-  mat_exp
+  return(mat_exp)
 }
 

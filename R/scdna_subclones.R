@@ -259,7 +259,8 @@ generate_subclone_cnv_gene_matrix <- function(
   scdna_gene_matrix <- Convert_scDNA_to_gene_matrix(
     genes_bin = genes_bin,
     scdna_tsv = scdna_tsv,
-    barcode_txt = barcode_txt
+    barcode_txt = barcode_txt, 
+    output_dir = output_dir
   )
 
   # Check column name consistency between gene matrix and Seurat object
