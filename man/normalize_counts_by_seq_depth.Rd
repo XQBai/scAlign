@@ -4,10 +4,10 @@
 \alias{normalize_counts_by_seq_depth}
 \title{Normalize counts by sequencing depth}
 \usage{
-normalize_counts_by_seq_depth(mat, normalize_factor = NA)
+normalize_counts_by_seq_depth(data, normalize_factor = NA)
 }
 \arguments{
-\item{mat}{Expression matrix}
+\item{data}{Expression matrix}
 
 \item{normalize_factor}{Numeric, normalization factor (default: median of column sums)}
 }

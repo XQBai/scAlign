@@ -2,7 +2,8 @@
 % Please edit documentation in R/scdna_subclones.R
 \name{construct_subclones}
 \alias{construct_subclones}
-\title{Construct subclones in G0G1 tumor cells using Seurat clustering}
+\title{Construct subclones in G0G1 tumor cells using Seurat clustering
+This function identifies subclones in G0G1 tumor cells by running Seurat clustering and assigning subclone labels.}
 \usage{
 construct_subclones(
   seurat_obj,
@@ -33,5 +34,6 @@ construct_subclones(
 A Seurat object with subclone labels assigned
 }
 \description{
+Construct subclones in G0G1 tumor cells using Seurat clustering
 This function identifies subclones in G0G1 tumor cells by running Seurat clustering and assigning subclone labels.
 }

@@ -1,5 +1,5 @@
+utils::globalVariables("index")
 #' Construct subclones in G0G1 tumor cells using Seurat clustering
-#'
 #' This function identifies subclones in G0G1 tumor cells by running Seurat clustering and assigning subclone labels.
 #'
 #' @param seurat_obj A Seurat object with celltype annotation

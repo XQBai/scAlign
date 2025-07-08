@@ -4,10 +4,10 @@
 \alias{Filter_genes_below_mean_exp_cutoff}
 \title{Filter genes below mean expression cutoff}
 \usage{
-Filter_genes_below_mean_exp_cutoff(mat, cutoff = 0.1)
+Filter_genes_below_mean_exp_cutoff(data, cutoff = 0.1)
 }
 \arguments{
-\item{mat}{Expression matrix}
+\item{data}{Expression matrix}
 
 \item{cutoff}{Numeric, mean expression cutoff}
 }

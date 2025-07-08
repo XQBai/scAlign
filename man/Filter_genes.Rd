@@ -4,10 +4,10 @@
 \alias{Filter_genes}
 \title{Filter genes expressed in fewer than min_num_cells}
 \usage{
-Filter_genes(mat, min_num_cells = 3)
+Filter_genes(data, min_num_cells = 3)
 }
 \arguments{
-\item{mat}{Expression matrix}
+\item{data}{Expression matrix}
 
 \item{min_num_cells}{Integer, minimum number of cells}
 }
