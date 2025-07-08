@@ -338,7 +338,7 @@ Convert_scDNA_to_gene_matrix <- function(
   scdna_matrix_bins$index <- bin_index
 
   scdna_gene_matrix <- scdna_matrix_bins %>%
-    dplyr::group_by(scdna_matrix_bins$index) %>%
+    dplyr::group_by(index) %>%
     dplyr::summarise_all(list(mean), na.rm = TRUE)
 
   scdna_gene_matrix$index <- NULL
