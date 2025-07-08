@@ -10,7 +10,8 @@ construct_subclones(
   resolution = 0.5,
   merge_clusters = TRUE,
   jaccard_threshold = 0.99,
-  binarize_threshold = 2
+  binarize_threshold = 2,
+  output_dir = "."
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ construct_subclones(
 \item{jaccard_threshold}{Jaccard similarity threshold for merging clusters (default 0.95)}
 
 \item{binarize_threshold}{Numeric threshold for binarizing CNV values (default 3)}
+
+\item{output_dir}{Directory to save output files, default is current working directory}
 }
 \value{
 A Seurat object with subclone labels assigned

@@ -4,10 +4,12 @@
 \alias{find_and_plot_markers}
 \title{Find markers and plot heatmaps for merged Seurat object}
 \usage{
-find_and_plot_markers(aggr)
+find_and_plot_markers(aggr, output_dir = ".")
 }
 \arguments{
 \item{aggr}{Processed Seurat object}
+
+\item{output_dir}{Directory to save output files, default is current working directory}
 }
 \description{
 Find markers and plot heatmaps for merged Seurat object

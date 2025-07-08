@@ -4,7 +4,12 @@
 \alias{Convert_scDNA_to_gene_matrix}
 \title{Convert scDNA-seq folder data to gene-level CNV matrix}
 \usage{
-Convert_scDNA_to_gene_matrix(genes_bin, scdna_tsv, barcode_txt)
+Convert_scDNA_to_gene_matrix(
+  genes_bin,
+  scdna_tsv,
+  barcode_txt,
+  output_dir = "."
+)
 }
 \arguments{
 \item{genes_bin}{Path to gene_bin.RData (should contain a variable genes_bin with $bins)}
@@ -12,6 +17,8 @@ Convert_scDNA_to_gene_matrix(genes_bin, scdna_tsv, barcode_txt)
 \item{scdna_tsv}{Folder path containing DNA matrix (e.g., .tsv or .mtx file)}
 
 \item{barcode_txt}{Folder path containing barcode file (e.g., .txt file)}
+
+\item{output_dir}{Directory to save output files, default is current working directory}
 }
 \value{
 A list with gene-level CNV matrix and used gene-bin mapping

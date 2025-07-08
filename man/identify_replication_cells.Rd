@@ -11,7 +11,8 @@ identify_replication_cells(
   plot_filename = "mixture_cells.pdf",
   refine_replicates = TRUE,
   mean_threshold = 2.5,
-  auto_threshold = "manual"
+  auto_threshold = "manual",
+  output_dir = "."
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ identify_replication_cells(
 \item{mean_threshold}{Threshold for mean CNV value in reidentify_replicates, default 2.5}
 
 \item{auto_threshold}{Whether to automatically determine threshold in reidentify_replicates, default 'manual'}
+
+\item{output_dir}{Directory to save output files, default is current working directory}
 }
 \value{
 Seurat object with updated celltype annotation (S phase or G0G1)

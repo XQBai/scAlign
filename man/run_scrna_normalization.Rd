@@ -7,7 +7,8 @@
 run_scrna_normalization(
   seurat_epi,
   gene_locs_path,
-  output_rds = "RNA_normalized_matrix.rds"
+  output_rds = "RNA_normalized_matrix.rds",
+  output_dir = "."
 )
 }
 \arguments{
@@ -16,6 +17,8 @@ run_scrna_normalization(
 \item{gene_locs_path}{Path to gene location file}
 
 \item{output_rds}{Path to save normalized matrix}
+
+\item{output_dir}{Directory to save output files, default is current working directory}
 }
 \value{
 Normalized matrix (invisible)

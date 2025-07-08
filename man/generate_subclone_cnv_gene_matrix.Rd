@@ -9,7 +9,8 @@ generate_subclone_cnv_gene_matrix(
   genes_bin,
   scdna_tsv,
   barcode_txt,
-  subclone_matrix_out = "scdna_gene_subclones.rds"
+  subclone_matrix_out = "scdna_gene_subclones.rds",
+  output_dir = "."
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ generate_subclone_cnv_gene_matrix(
 \item{barcode_txt}{barcode file (e.g., .txt)}
 
 \item{subclone_matrix_out}{save subclone-averaged gene CNV matrix (default 'scdna_gene_subclones.rds')}
+
+\item{output_dir}{Directory to save output files, default is current working directory}
 }
 \value{
 A list with:

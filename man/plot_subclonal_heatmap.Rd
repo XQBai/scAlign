@@ -2,7 +2,9 @@
 % Please edit documentation in R/scdna_visualiztion.R
 \name{plot_subclonal_heatmap}
 \alias{plot_subclonal_heatmap}
-\title{Plot subclonal CNV heatmap for scDNA-seq data}
+\title{Plot subclonal CNV heatmap for scDNA-seq data
+This function generates a subclonal CNV heatmap from a Seurat object and segment location information.
+It supports plotting with or without noise/normal cells, and saves the heatmap as a PDF.}
 \usage{
 plot_subclonal_heatmap(
   seurat_obj,
@@ -30,6 +32,7 @@ plot_subclonal_heatmap(
 Invisibly returns the matrix used for plotting
 }
 \description{
+Plot subclonal CNV heatmap for scDNA-seq data
 This function generates a subclonal CNV heatmap from a Seurat object and segment location information.
 It supports plotting with or without noise/normal cells, and saves the heatmap as a PDF.
 }

@@ -8,7 +8,8 @@ identify_technical_noise(
   seurat_obj = "seurat_scDNA.rds",
   dropout_threshold = 0.1,
   output_plot = TRUE,
-  plot_filename = "Miss_val_proportion.pdf"
+  plot_filename = "Miss_val_proportion.pdf",
+  output_dir = "."
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ identify_technical_noise(
 \item{output_plot}{Whether to save dropout plot, default TRUE}
 
 \item{plot_filename}{Output plot filename, default 'Miss_val_proportion.pdf'}
+
+\item{output_dir}{Directory to save output files, default is current working directory}
 }
 \value{
 Seurat object with updated celltype annotation

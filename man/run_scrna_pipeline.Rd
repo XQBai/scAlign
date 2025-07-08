@@ -12,6 +12,7 @@ run_scrna_pipeline(
   do_process = TRUE,
   do_marker = TRUE,
   do_epithelial = TRUE,
+  output_dir = ".",
   ...
 )
 }
@@ -29,6 +30,8 @@ run_scrna_pipeline(
 \item{do_marker}{Whether to find and plot markers (default TRUE)}
 
 \item{do_epithelial}{Whether to extract epithelial cells and rerun pipeline (default TRUE)}
+
+\item{output_dir}{Directory to save output files, default is current working directory}
 
 \item{...}{Other parameters for downstream functions}
 }

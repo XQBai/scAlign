@@ -2,7 +2,8 @@
 % Please edit documentation in R/scdna_visualiztion.R
 \name{SortCells_in_subclone}
 \alias{SortCells_in_subclone}
-\title{Sort cells within a subclone by correlation}
+\title{Sort cells within a subclone by correlation
+This function sorts cells within a subclone based on a correlation vector.}
 \usage{
 SortCells_in_subclone(scdna_matrix, distance)
 }
@@ -15,5 +16,6 @@ SortCells_in_subclone(scdna_matrix, distance)
 A matrix with columns (cells) sorted by distance
 }
 \description{
+Sort cells within a subclone by correlation
 This function sorts cells within a subclone based on a correlation vector.
 }

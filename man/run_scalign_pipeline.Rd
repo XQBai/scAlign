@@ -14,7 +14,8 @@ run_scalign_pipeline(
   signal_chr = c(1, 2, 3, 4, 5),
   output_seurat_rds = "seurat_epi.rds",
   output_alignment_csv = "project_alignment.csv",
-  method = "euclidean"
+  method = "euclidean",
+  output_dir = "."
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ run_scalign_pipeline(
 \item{output_alignment_csv}{Path to save alignment results (default 'project_alignment.csv')}
 
 \item{method}{Distance method: "euclidean" or "correlation" (default "euclidean")}
+
+\item{output_dir}{Directory to save output files, default is current working directory}
 }
 \value{
 Updated Seurat object with alignment labels

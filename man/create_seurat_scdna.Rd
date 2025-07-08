@@ -8,7 +8,8 @@ create_seurat_scdna(
   scdna_matrix_merge,
   scdna_matrix_locs,
   dims_reduce = 50,
-  output_file = "seurat_scDNA.rds"
+  output_file = "seurat_scDNA.rds",
+  output_dir = "."
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ create_seurat_scdna(
 \item{dims_reduce}{Number of dimensions for reduction, default 50}
 
 \item{output_file}{Output file name for saving Seurat object, default 'seurat_scDNA.rds'}
+
+\item{output_dir}{Directory to save output files, default is current working directory}
 }
 \value{
 Seurat object after PCA, UMAP, and neighbor finding
