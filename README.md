@@ -18,6 +18,7 @@ ScDNA-seq and scRNA-seq data for all samples can be downloaded from the [Ji Rese
 library(scAlign)
 library(Seurat)
 library(tidyverse)
+library(data.table)
 
 # create output directories
 dir.create('./output/scDNA', showWarnings = FALSE, recursive = TRUE)
