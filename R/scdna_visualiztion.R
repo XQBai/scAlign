@@ -9,6 +9,7 @@ utils::globalVariables(c("chr", "bin"))
 #' @param celltype Character vector of celltypes from the plot (e.g., c('normal','noise')), default NULL
 #' @param max_cnv_value Maximum CNV value to cap in the heatmap (default 6)
 #' @param hc_rds Optional path to hierarchical clustering RDS file for subclone ordering (default NULL)
+#' @param output_dir Output directory for saving the heatmap (default current directory)
 #' @return Invisibly returns the matrix used for plotting
 #' @export
 plot_subclonal_heatmap <- function(
@@ -17,7 +18,8 @@ plot_subclonal_heatmap <- function(
   output_pdf = 'Subclones_heatmap.pdf',
   celltype = "G0G1",
   max_cnv_value = 6,
-  hc_rds = NULL
+  hc_rds = NULL,
+  output_dir = "."
 ) {
   # Data preparation
   scdna_matrix_merge <- as.data.frame(seurat_obj@assays$RNA@layers$counts)
@@ -82,7 +84,8 @@ plot_subclonal_heatmap <- function(
 
   # Plot and save heatmap
   filename <- paste0(celltype, '_', output_pdf)
-  Plot_CNV_heatmap(mat, labels, gene_chr_mark, filename)
+  full_path <- file.path(output_dir, filename)
+  Plot_CNV_heatmap(mat, labels, gene_chr_mark, full_path)
   invisible(mat)
 }
 
@@ -127,9 +130,7 @@ SortCells_in_subclone <- function(scdna_matrix, distance) {
 }
 
 #' Sort cells by subclone and correlation
-#'
 #' This function sorts cells first by subclone label, then within each subclone by correlation.
-#'
 #' @param scdna_matrix A matrix of CNV values (features x cells)
 #' @param label A vector of subclone labels (numeric or factor)
 #' @param distance A numeric vector of correlation or distance values for sorting
@@ -160,7 +161,6 @@ SortCells <- function(scdna_matrix, label, distance) {
 }
 
 #' Plot subclonal CNV heatmap
-#'
 #' This function plots a CNV heatmap for subclones, with chromosome and subclone annotations.
 #' @importFrom circlize colorRamp2
 #' @importFrom RColorBrewer brewer.pal

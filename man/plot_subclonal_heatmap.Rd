@@ -12,7 +12,8 @@ plot_subclonal_heatmap(
   output_pdf = "Subclones_heatmap.pdf",
   celltype = "G0G1",
   max_cnv_value = 6,
-  hc_rds = NULL
+  hc_rds = NULL,
+  output_dir = "."
 )
 }
 \arguments{
@@ -27,6 +28,8 @@ plot_subclonal_heatmap(
 \item{max_cnv_value}{Maximum CNV value to cap in the heatmap (default 6)}
 
 \item{hc_rds}{Optional path to hierarchical clustering RDS file for subclone ordering (default NULL)}
+
+\item{output_dir}{Output directory for saving the heatmap (default current directory)}
 }
 \value{
 Invisibly returns the matrix used for plotting

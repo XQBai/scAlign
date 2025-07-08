@@ -4,7 +4,7 @@
 \alias{run_seurat}
 \title{Run Seurat clustering on scDNA-seq matrix}
 \usage{
-run_seurat(seurat_obj, dims.reduce = 50, resolution = 0.5)
+run_seurat(seurat_obj, dims.reduce = 50, resolution = 0.5, output_dir = ".")
 }
 \arguments{
 \item{seurat_obj}{A Seurat object}
@@ -12,6 +12,8 @@ run_seurat(seurat_obj, dims.reduce = 50, resolution = 0.5)
 \item{dims.reduce}{Number of dimensions for reduction (default 50)}
 
 \item{resolution}{Clustering resolution parameter (default: 0.1 if <=600 cells, else 0.5)}
+
+\item{output_dir}{Directory to save output files, default is current working directory}
 }
 \value{
 A Seurat object with clustering results

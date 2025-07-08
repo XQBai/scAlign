@@ -19,7 +19,7 @@ construct_subclones <- function(seurat_obj, dims.reduce = 50, resolution = 0.5, 
   }else{
     seurat_obj_subset <- seurat_obj
   }
-  seurat_obj_subset <- run_seurat(seurat_obj_subset, dims.reduce = dims.reduce, resolution = resolution)
+  seurat_obj_subset <- run_seurat(seurat_obj_subset, dims.reduce = dims.reduce, resolution = resolution, output_dir = output_dir)
     seurat_obj_subset$subclones <- paste0('C', as.numeric(seurat_obj_subset$seurat_clusters))
   # merge the overclustering to the same subclone
   if (merge_clusters) {
@@ -54,9 +54,10 @@ construct_subclones <- function(seurat_obj, dims.reduce = 50, resolution = 0.5, 
 #' @param seurat_obj A Seurat object
 #' @param dims.reduce Number of dimensions for reduction (default 50)
 #' @param resolution Clustering resolution parameter (default: 0.1 if <=600 cells, else 0.5)
+#' @param output_dir Directory to save output files, default is current working directory
 #' @return A Seurat object with clustering results
 #' @export
-run_seurat <- function(seurat_obj, dims.reduce = 50, resolution = 0.5) {
+run_seurat <- function(seurat_obj, dims.reduce = 50, resolution = 0.5, output_dir = '.') {
 
 
   scdna_matrix = seurat_obj@assays$RNA@layers$counts
@@ -64,7 +65,7 @@ run_seurat <- function(seurat_obj, dims.reduce = 50, resolution = 0.5) {
 
   # Feature selection
   y <- tryCatch({
-    Iden_signal_segments(scdna_matrix)
+    Iden_signal_segments(scdna_matrix, output_dir=output_dir)
   }, warning = function(w) {
     return(0)
   }, error = function(e) {
@@ -74,7 +75,7 @@ run_seurat <- function(seurat_obj, dims.reduce = 50, resolution = 0.5) {
   if(length(y) == 1 && y == 0) {
     index_segment <- seq(1, dim(scdna_matrix)[1])
   } else {
-    index_segment <- Iden_signal_segments(scdna_matrix)
+    index_segment <- Iden_signal_segments(scdna_matrix, output_dir = output_dir)
   }
 
   signal_segment <- rownames(seurat_obj)[index_segment]

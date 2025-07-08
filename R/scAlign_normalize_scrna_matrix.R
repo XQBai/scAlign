@@ -42,6 +42,8 @@ run_scrna_normalization <- function(seurat_epi, gene_locs_path, output_rds = 'RN
 #' @return Filtered matrix
 #' @export
 Filter_genes_below_mean_exp_cutoff <- function(data, cutoff = 0.1) {
+
+  data <- as.matrix(data)
   average_gene <- rowMeans(data)
   remain_indices <- which(average_gene > cutoff)
   data[remain_indices, , drop = FALSE]

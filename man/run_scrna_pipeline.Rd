@@ -13,6 +13,8 @@ run_scrna_pipeline(
   do_marker = TRUE,
   do_epithelial = TRUE,
   output_dir = ".",
+  dims.reduce = 50,
+  cluster.res = 0.8,
   ...
 )
 }
@@ -32,6 +34,10 @@ run_scrna_pipeline(
 \item{do_epithelial}{Whether to extract epithelial cells and rerun pipeline (default TRUE)}
 
 \item{output_dir}{Directory to save output files, default is current working directory}
+
+\item{dims.reduce}{Number of PCA，default 50}
+
+\item{cluster.res}{Clustering resoultion, default 0.8}
 
 \item{...}{Other parameters for downstream functions}
 }

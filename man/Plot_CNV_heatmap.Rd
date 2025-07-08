@@ -2,7 +2,8 @@
 % Please edit documentation in R/scdna_visualiztion.R
 \name{Plot_CNV_heatmap}
 \alias{Plot_CNV_heatmap}
-\title{Plot subclonal CNV heatmap}
+\title{Plot subclonal CNV heatmap
+This function plots a CNV heatmap for subclones, with chromosome and subclone annotations.}
 \usage{
 Plot_CNV_heatmap(mat, labels, gene_chr_mark, filename)
 }
@@ -19,5 +20,6 @@ Plot_CNV_heatmap(mat, labels, gene_chr_mark, filename)
 Invisibly returns NULL
 }
 \description{
+Plot subclonal CNV heatmap
 This function plots a CNV heatmap for subclones, with chromosome and subclone annotations.
 }

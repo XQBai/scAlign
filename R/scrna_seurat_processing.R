@@ -8,6 +8,8 @@ utils::globalVariables(c("id", "score", "score2", "score3", "score4", "me", "mn"
 #' @param do_marker Whether to find and plot markers (default TRUE)
 #' @param do_epithelial Whether to extract epithelial cells and rerun pipeline (default TRUE)
 #' @param output_dir Directory to save output files, default is current working directory
+#' @param dims.reduce Number of PCA，default 50
+#' @param cluster.res Clustering resoultion, default 0.8
 #' @param ... Other parameters for downstream functions
 #' @return List of all intermediate and final objects
 #' @export
@@ -20,6 +22,8 @@ run_scrna_pipeline <- function(
     do_marker = TRUE,
     do_epithelial = TRUE,
     output_dir = ".",
+    dims.reduce = 50,
+    cluster.res = 0.8,
     ...
 ) {
   seu_merged <- NULL
@@ -41,7 +45,7 @@ run_scrna_pipeline <- function(
   }
 
   if (do_process) {
-    aggr <- process_merged_seurat(seu_merged)
+    aggr <- process_merged_seurat(seu_merged, dims.reduce = dims.reduce, cluster.res = cluster.res)
   } else {
     aggr <- seu_merged
   }
