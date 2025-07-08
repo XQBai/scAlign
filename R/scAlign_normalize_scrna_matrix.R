@@ -1,10 +1,12 @@
 #' Main scRNA normalization pipeline
+#' @importFrom methods slotNames
 #' @param seurat_epi Seurat RDS file
 #' @param gene_locs_path Path to gene location file
 #' @param output_rds Path to save normalized matrix
+#' @param output_dir Directory to save output files, default is current working directory
 #' @return Normalized matrix (invisible)
 #' @export
-run_scrna_normalization <- function(seurat_epi, gene_locs_path, output_rds = 'RNA_normalized_matrix.rds') {
+run_scrna_normalization <- function(seurat_epi, gene_locs_path, output_rds = 'RNA_normalized_matrix.rds', output_dir = ".") {
 
   if ('condition' %in% names(seu_epi@meta.data)){
     seu_epi <- subset(seu_epi, cells = which(seu_epi$condition == 'tumor'))
@@ -23,7 +25,13 @@ run_scrna_normalization <- function(seurat_epi, gene_locs_path, output_rds = 'RN
 
   gene_locs <- fread(gene_locs_path)
   normalized_rna_matrix <- Normalize_RNA(raw_matrix, gene_locs)
-  saveRDS(normalized_rna_matrix, file = output_rds)
+  
+  # Create output directory if it doesn't exist
+  if (!dir.exists(output_dir)) {
+    dir.create(output_dir, recursive = TRUE)
+  }
+  
+  saveRDS(normalized_rna_matrix, file = file.path(output_dir, output_rds))
   return(normalized_rna_matrix)
 }
 

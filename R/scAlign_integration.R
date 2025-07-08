@@ -1,3 +1,5 @@
+
+utils::globalVariables("V2")
 #' Main scAlign pipeline for scDNA and scRNA integration
 #' @param scrna_normalized_matrix Normalized scRNA matrix
 #' @param scdna_gene_matrix scDNA gene matrix
@@ -9,6 +11,7 @@
 #' @param output_seurat_rds Path to save updated Seurat object (default 'seurat_epi.rds')
 #' @param output_alignment_csv Path to save alignment results (default 'project_alignment.csv')
 #' @param method Distance method: "euclidean" or "correlation" (default "euclidean")
+#' @param output_dir Directory to save output files, default is current working directory
 #' @return Updated Seurat object with alignment labels
 #' @export
 run_scalign_pipeline <- function(
@@ -21,7 +24,8 @@ run_scalign_pipeline <- function(
     signal_chr = c(1, 2, 3, 4, 5),
     output_seurat_rds = 'seurat_epi.rds',
     output_alignment_csv = 'project_alignment.csv',
-    method = "euclidean"
+    method = "euclidean",
+    output_dir = "."
 ) {
 
   # Get signal chromosomes
@@ -89,11 +93,16 @@ run_scalign_pipeline <- function(
 
   seu_epi$pro_alignment <- label_new
 
+  # Create output directory if it doesn't exist
+  if (!dir.exists(output_dir)) {
+    dir.create(output_dir, recursive = TRUE)
+  }
+  
   # Save results
-  saveRDS(seu_epi, file = output_seurat_rds)
+  saveRDS(seu_epi, file = file.path(output_dir, output_seurat_rds))
 
   df <- as.data.frame(table(label_new))
-  write.csv(df, file = output_alignment_csv)
+  write.csv(df, file = file.path(output_dir, output_alignment_csv))
 
   return(seu_epi)
 }

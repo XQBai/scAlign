@@ -8,9 +8,10 @@
 #' @param merge_clusters Whether to merge overclustered subclones using Jaccard similarity (default TRUE)
 #' @param jaccard_threshold Jaccard similarity threshold for merging clusters (default 0.95)
 #' @param binarize_threshold Numeric threshold for binarizing CNV values (default 3)
+#' @param output_dir Directory to save output files, default is current working directory
 #' @return A Seurat object with subclone labels assigned
 #' @export
-construct_subclones <- function(seurat_obj, dims.reduce = 50, resolution = 0.5, merge_clusters = TRUE, jaccard_threshold = 0.99, binarize_threshold = 2) {
+construct_subclones <- function(seurat_obj, dims.reduce = 50, resolution = 0.5, merge_clusters = TRUE, jaccard_threshold = 0.99, binarize_threshold = 2, output_dir = ".") {
 
   celltype <- seurat_obj$celltype
   if (any(celltype == 'G0G1')){
@@ -25,6 +26,7 @@ construct_subclones <- function(seurat_obj, dims.reduce = 50, resolution = 0.5, 
     message('Merging overclustered subclones using Jaccard similarity...')
     labels <- paste0('C', as.numeric(seurat_obj_subset$seurat_clusters))
     mat <- seurat_obj_subset@assays$RNA@layers$counts
+    mat <- as.matrix(mat)
     res <- merge_clusters_by_jaccard(t(mat), labels, threshold = jaccard_threshold, binarize_threshold = binarize_threshold)
     labels_merge <- res$new_labels
     seurat_obj_subset$subclones <- labels_merge
@@ -36,14 +38,19 @@ construct_subclones <- function(seurat_obj, dims.reduce = 50, resolution = 0.5, 
     celltype[which(celltype == 'G0G1')] <- seurat_obj_subset$subclones
     seurat_obj$subclones <- celltype
   }
-  saveRDS(seurat_obj_subset, file = 'seurat_scDNA_tumor.rds')
-  saveRDS(seurat_obj, file = 'seurat_scDNA.rds')
+  # Create output directory if it doesn't exist
+  if (!dir.exists(output_dir)) {
+    dir.create(output_dir, recursive = TRUE)
+  }
+  
+  saveRDS(seurat_obj_subset, file = file.path(output_dir, 'seurat_scDNA_tumor.rds'))
+  saveRDS(seurat_obj, file = file.path(output_dir, 'seurat_scDNA.rds'))
   return(seurat_obj)
 }
 #' Run Seurat clustering on scDNA-seq matrix
 #'
 #' This function performs feature selection, dimensionality reduction, and clustering on a scDNA-seq matrix.
-#'
+#' @importFrom Seurat Idents Idents<-
 #' @param seurat_obj A Seurat object
 #' @param dims.reduce Number of dimensions for reduction (default 50)
 #' @param resolution Clustering resolution parameter (default: 0.1 if <=600 cells, else 0.5)
@@ -51,7 +58,6 @@ construct_subclones <- function(seurat_obj, dims.reduce = 50, resolution = 0.5, 
 #' @export
 run_seurat <- function(seurat_obj, dims.reduce = 50, resolution = 0.5) {
 
-  library(Seurat)
 
   scdna_matrix = seurat_obj@assays$RNA@layers$counts
   # row.names(scdna_matrix) <- paste0('segment', 1:dim(scdna_matrix)[1])
@@ -93,15 +99,21 @@ run_seurat <- function(seurat_obj, dims.reduce = 50, resolution = 0.5) {
 #' @importFrom grDevices pdf dev.off
 #' @importFrom mixtools normalmixEM
 #' @param scdna_matrix A matrix of scDNA-seq CNV values (segments x cells)
+#' @param output_dir Directory to save output files, default is current working directory
 #' @return A vector of indices for informative segments
 #' @export
-Iden_signal_segments <- function(scdna_matrix) {
-  library(mixtools)
+Iden_signal_segments <- function(scdna_matrix, output_dir = ".") {
+ 
   arm_sd <- apply(scdna_matrix, 1, sd)
   arm_mean <- apply(scdna_matrix-2, 1, mean)
   arm_sd <- arm_sd[union(which(arm_sd != 0), which(arm_mean != 0))]
 
-  pdf('./Segments_density_curve.pdf')
+  # Create output directory if it doesn't exist
+  if (!dir.exists(output_dir)) {
+    dir.create(output_dir, recursive = TRUE)
+  }
+  
+  pdf(file.path(output_dir, 'Segments_density_curve.pdf'))
   mixtools::plot.mixEM(normalmixEM(arm_sd), whichplots = 2, main2 = 'Selection of informative segments', xlab2 = 'Standard deviation of CNVs on segments',
                       lwd2 = 3, marginal = TRUE)
   dev.off()
@@ -134,7 +146,9 @@ Iden_signal_segments <- function(scdna_matrix) {
 #'
 #' This function merges clusters based on the Jaccard similarity of their binarized CNV profiles.
 #' Clusters with Jaccard similarity above the threshold are merged into the same group.
-#'
+#' @importFrom Seurat RenameCells
+#' @importFrom stats setNames
+#' @importFrom igraph graph_from_adjacency_matrix components
 #' @param data A matrix or data.frame of CNV values (cells x features)
 #' @param labels A vector or factor of cluster labels for each cell
 #' @param threshold Jaccard similarity threshold for merging clusters (default 0.95)
@@ -142,10 +156,6 @@ Iden_signal_segments <- function(scdna_matrix) {
 #' @return A list containing the Jaccard matrix, cluster graph, new labels, and cluster map
 #' @export
 merge_clusters_by_jaccard <- function(data, labels, threshold = 0.95, binarize_threshold = 3) {
-  # Load required packages
-  require(dplyr)
-  require(data.table)
-  require(igraph)
 
   labels <- as.factor(labels)
   clusters <- levels(labels)
@@ -196,8 +206,8 @@ merge_clusters_by_jaccard <- function(data, labels, threshold = 0.95, binarize_t
     diag(adj) <- TRUE
   }
 
-  g <- igraph::graph_from_adjacency_matrix(adj, mode = "undirected")
-  comps <- igraph::components(g)$membership
+  g <- graph_from_adjacency_matrix(adj, mode = "undirected")
+  comps <- components(g)$membership
 
   # Map old cluster labels (C1, C2, ...) to new cluster groupings (G1, G2, ...)
   cluster_map <- paste0("C", comps)
@@ -223,13 +233,14 @@ merge_clusters_by_jaccard <- function(data, labels, threshold = 0.95, binarize_t
 #' This function generates a gene-level CNV matrix for all tumor cells and a subclone-averaged CNV matrix
 #' based on a Seurat object annotated with subclones and cell types. It supports flexible input of gene-bin mapping,
 #' raw scDNA-seq matrix, and barcode files.
-#' @importFrom dplyr across  
+#' @importFrom dplyr across where
 #' @importFrom magrittr %>%
 #' @param seurat_obj Seurat object (or path to RDS file) containing scDNA-seq data, annotated with subclones and cell types
 #' @param genes_bin  gene-bin mapping RData file (should contain a variable genes_bin with $bins, $entrezgene, $symbolgene)
 #' @param scdna_tsv  raw scDNA-seq matrix file (e.g., .tsv or .mtx)
 #' @param barcode_txt barcode file (e.g., .txt)
 #' @param subclone_matrix_out save subclone-averaged gene CNV matrix (default 'scdna_gene_subclones.rds')
+#' @param output_dir Directory to save output files, default is current working directory
 #' @return A list with:
 #'   \item{scdna_gene_matrix_tumor}{Gene-level CNV matrix for all tumor cells (genes x cells)}
 #'   \item{scdna_gene_matrix_subclone}{Subclone-averaged gene CNV matrix (subclones x genes)}
@@ -240,7 +251,8 @@ generate_subclone_cnv_gene_matrix <- function(
   scdna_tsv,
   barcode_txt,
   # tumor_matrix_out = 'scdna_tumor_matrix_gene.rds',
-  subclone_matrix_out = 'scdna_gene_subclones.rds'
+  subclone_matrix_out = 'scdna_gene_subclones.rds',
+  output_dir = "."
 ) {
 
   # Generate gene-level CNV matrix
@@ -278,7 +290,12 @@ generate_subclone_cnv_gene_matrix <- function(
   colnames(CNV_subset_mean) <- gene_list
   rownames(CNV_subset_mean) <- subclone
 
-  saveRDS(CNV_subset_mean, file = subclone_matrix_out)
+  # Create output directory if it doesn't exist
+  if (!dir.exists(output_dir)) {
+    dir.create(output_dir, recursive = TRUE)
+  }
+  
+  saveRDS(CNV_subset_mean, file = file.path(output_dir, subclone_matrix_out))
 
   return(CNV_subset_mean)
 }
@@ -294,12 +311,14 @@ generate_subclone_cnv_gene_matrix <- function(
 #' @param genes_bin Path to gene_bin.RData (should contain a variable genes_bin with $bins)
 #' @param scdna_tsv Folder path containing DNA matrix (e.g., .tsv or .mtx file)
 #' @param barcode_txt Folder path containing barcode file (e.g., .txt file)
+#' @param output_dir Directory to save output files, default is current working directory
 #' @return A list with gene-level CNV matrix and used gene-bin mapping
 #' @export 
 Convert_scDNA_to_gene_matrix <- function(
   genes_bin,
   scdna_tsv,
-  barcode_txt
+  barcode_txt,
+  output_dir = "."
 ) {
 
   # Read genome reference
@@ -338,7 +357,12 @@ Convert_scDNA_to_gene_matrix <- function(
   rownames(scdna_gene_matrix) <- symbolgene
   colnames(scdna_gene_matrix) <- barcodes$V1
 
-  saveRDS(scdna_gene_matrix, file = 'scdna_gene_matrix.rds')
+  # Create output directory if it doesn't exist
+  if (!dir.exists(output_dir)) {
+    dir.create(output_dir, recursive = TRUE)
+  }
+  
+  saveRDS(scdna_gene_matrix, file = file.path(output_dir, 'scdna_gene_matrix.rds'))
   return(scdna_gene_matrix)
 }
 

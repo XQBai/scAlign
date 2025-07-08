@@ -1,15 +1,18 @@
+utils::globalVariables(c("V1", "chr", "bin"))
+
 #' Preprocessing function for scDNA-seq data
 #' @importFrom data.table fread
 #' @importFrom magrittr %>%
-#' @importFrom dplyr group_by mutate filter
+#' @importFrom dplyr group_by mutate filter row_number
 #' @param genome_reference_file Path to genome reference bed file
 #' @param scdna_tsv Path to scDNA-seq matrix tsv file
 #' @param barcode_txt Path to barcode txt file
 #' @param bin_size Number of bins to merge, default 50
 #' @param dims_reduce Number of dimensions for reduction, default 50
-#' @return list(seurat_obj, matrix_rds, locs_rds, seurat_rds)
+#' @param output_dir Directory to save output files, default is current working directory
+#' @return list(scdna_matrix_merge,scdna_matrix_locs)
 #' @export
-scdna_preprocessing <- function(genome_reference_file, scdna_tsv, barcode_txt, bin_size=50, dims_reduce=50) {
+scdna_preprocessing <- function(genome_reference_file, scdna_tsv, barcode_txt, bin_size=50, dims_reduce=50, output_dir=".") {
 
   # Read genome reference
   genome_reference <- fread(genome_reference_file, header=F, data.table=F)
@@ -36,9 +39,14 @@ scdna_preprocessing <- function(genome_reference_file, scdna_tsv, barcode_txt, b
   row.names(scdna_matrix_merge) <- paste0('segment', 1:dim(scdna_matrix_merge)[1])
 
 
+  # Create output directory if it doesn't exist
+  if (!dir.exists(output_dir)) {
+    dir.create(output_dir, recursive = TRUE)
+  }
+  
   # Save results
-  saveRDS(scdna_matrix_merge, file='scdna_matrix_all_barcodes.rds')
-  saveRDS(scdna_matrix_locs, file='scdna_matrix_locs.rds')
+  saveRDS(scdna_matrix_merge, file=file.path(output_dir, 'scdna_matrix_all_barcodes.rds'))
+  saveRDS(scdna_matrix_locs, file=file.path(output_dir, 'scdna_matrix_locs.rds'))
 
   return(list(scdna_matrix_merge,
               scdna_matrix_locs))

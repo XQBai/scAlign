@@ -1,3 +1,9 @@
+utils::globalVariables(c(
+  "chr", 
+  "variable", 
+  "cell_index", 
+  "dropout_proportion"
+))
 #' Create Seurat object for scDNA-seq data and perform dimensionality reduction
 #' @importFrom Seurat CreateSeuratObject SetAssayData GetAssayData
 #' @importFrom Seurat ScaleData RunPCA RunUMAP FindNeighbors
@@ -6,12 +12,14 @@
 #' @param scdna_matrix_locs Data frame of segment locations (not used in this function, but kept for interface consistency)
 #' @param dims_reduce Number of dimensions for reduction, default 50
 #' @param output_file Output file name for saving Seurat object, default 'seurat_scDNA.rds'
+#' @param output_dir Directory to save output files, default is current working directory
 #' @return Seurat object after PCA, UMAP, and neighbor finding
 #' @export
 create_seurat_scdna <- function(scdna_matrix_merge,
                                scdna_matrix_locs,
                                dims_reduce = 50,
-                               output_file = 'seurat_scDNA.rds') {
+                               output_file = 'seurat_scDNA.rds',
+                               output_dir = ".") {
 
   # Create Seurat object from input matrix
   seurat_obj <- CreateSeuratObject(
@@ -38,8 +46,13 @@ create_seurat_scdna <- function(scdna_matrix_merge,
     ) %>%
     FindNeighbors(reduction = 'umap', dims = 1:2)
 
+  # Create output directory if it doesn't exist
+  if (!dir.exists(output_dir)) {
+    dir.create(output_dir, recursive = TRUE)
+  }
+  
   # Save Seurat object
-  saveRDS(seurat_obj, file = output_file)
+  saveRDS(seurat_obj, file = file.path(output_dir, output_file))
   return(seurat_obj)
 }
 
@@ -79,12 +92,14 @@ identify_cellranger_noise <- function(per_cell_metrics_file = 'per_cell_summary_
 #' @param dropout_threshold Threshold for CNV dropout proportion, default 0.1
 #' @param output_plot Whether to save dropout plot, default TRUE
 #' @param plot_filename Output plot filename, default 'Miss_val_proportion.pdf'
+#' @param output_dir Directory to save output files, default is current working directory
 #' @return Seurat object with updated celltype annotation
 #' @export
 identify_technical_noise <- function(seurat_obj = 'seurat_scDNA.rds',
                                    dropout_threshold = 0.1,
                                    output_plot = TRUE,
-                                   plot_filename = 'Miss_val_proportion.pdf') {
+                                   plot_filename = 'Miss_val_proportion.pdf',
+                                   output_dir = ".") {
 
   # Handle seurat_obj input (can be file path or Seurat object)
   if (is.character(seurat_obj)) {
@@ -120,7 +135,12 @@ identify_technical_noise <- function(seurat_obj = 'seurat_scDNA.rds',
       theme(axis.title.x = element_text(size = 15, color = 'black', face = 'bold')) +
       theme(axis.title.y = element_text(size = 15, color = 'black', face = 'bold'))
 
-    ggsave(filename = plot_filename, plot = p, device = "pdf", width = 8, height = 6)
+    # Create output directory if it doesn't exist
+    if (!dir.exists(output_dir)) {
+      dir.create(output_dir, recursive = TRUE)
+    }
+    
+    ggsave(filename = file.path(output_dir, plot_filename), plot = p, device = "pdf", width = 8, height = 6)
   }
 
   # Check if celltype column exists, if not, initialize as 0
@@ -136,6 +156,7 @@ identify_technical_noise <- function(seurat_obj = 'seurat_scDNA.rds',
 #' Identify normal cells based on chromosome-wise CNV analysis
 #' @importFrom dplyr group_by summarise_all 
 #' @importFrom magrittr %>%
+#' @importFrom reshape2 melt
 #' @param seurat_obj Seurat object with celltype annotation
 #' @param scdna_matrix_locs Data frame with chromosome information for segments
 #' @param cnv_threshold Threshold for CNV value to identify tumor cells, default 2.5
@@ -180,7 +201,7 @@ identify_normal_cells <- function(seurat_obj='seurat_scDNA.rds',
   chr_averages$chr <- NULL
 
   # Melt data for analysis
-  chr_averages_melt <- reshape2::melt(chr_averages, measure.vars = colnames(chr_averages))
+  chr_averages_melt <- melt(chr_averages, measure.vars = colnames(chr_averages))
 
   # Classify cells based on CNV threshold
   cell_classification <- chr_averages_melt %>%
@@ -211,6 +232,7 @@ identify_normal_cells <- function(seurat_obj='seurat_scDNA.rds',
 #' @param refine_replicates Whether to further refine S phase/G0G1 classification using reidentify_replicates, default FALSE
 #' @param mean_threshold Threshold for mean CNV value in reidentify_replicates, default 2.5
 #' @param auto_threshold Whether to automatically determine threshold in reidentify_replicates, default 'manual'
+#' @param output_dir Directory to save output files, default is current working directory
 #' @return Seurat object with updated celltype annotation (S phase or G0G1)
 #' @export
 identify_replication_cells <- function(seurat_obj = 'seurat_scDNA.rds',
@@ -219,12 +241,9 @@ identify_replication_cells <- function(seurat_obj = 'seurat_scDNA.rds',
                                      plot_filename = 'mixture_cells.pdf',
                                      refine_replicates = TRUE,
                                      mean_threshold = 2.5,
-                                     auto_threshold = 'manual') {
+                                     auto_threshold = 'manual',
+                                     output_dir = ".") {
 
-  # Load required libraries
-  library(Seurat)
-  library(dplyr)
-  library(mixtools)
 
   # Handle seurat_obj input (can be file path or Seurat object)
   if (is.character(seurat_obj)) {
@@ -265,7 +284,12 @@ identify_replication_cells <- function(seurat_obj = 'seurat_scDNA.rds',
 
   # Create mixture model plot if requested
   if (output_plot) {
-    pdf(plot_filename)
+    # Create output directory if it doesn't exist
+    if (!dir.exists(output_dir)) {
+      dir.create(output_dir, recursive = TRUE)
+    }
+    
+    pdf(file.path(output_dir, plot_filename))
     mixtools::plot.mixEM(
       mixture_model,
       whichplots = 2,

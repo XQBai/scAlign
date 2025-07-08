@@ -1,3 +1,4 @@
+utils::globalVariables(c("id", "score", "score2", "score3", "score4", "me", "mn", ".", "cluster", "avg_log2FC"))
 #' Run full scRNA-seq integration and analysis pipeline with step control
 #' @param rds_files Vector of Seurat RDS file paths
 #' @param sample_list List of sample names for each Seurat object (optional)
@@ -6,6 +7,7 @@
 #' @param do_process Whether to run SCTransform/PCA/UMAP/clustering (default TRUE)
 #' @param do_marker Whether to find and plot markers (default TRUE)
 #' @param do_epithelial Whether to extract epithelial cells and rerun pipeline (default TRUE)
+#' @param output_dir Directory to save output files, default is current working directory
 #' @param ... Other parameters for downstream functions
 #' @return List of all intermediate and final objects
 #' @export
@@ -17,15 +19,21 @@ run_scrna_pipeline <- function(
     do_process = TRUE,
     do_marker = TRUE,
     do_epithelial = TRUE,
+    output_dir = ".",
     ...
 ) {
   seu_merged <- NULL
   aggr <- NULL
   seu_epi <- NULL
 
+  # Create output directory if it doesn't exist
+  if (!dir.exists(output_dir)) {
+    dir.create(output_dir, recursive = TRUE)
+  }
+  
   if (length(rds_files) > 1 && do_merge) {
     seu_merged <- merge_seurat_objects(rds_files, sample_list, condition_list)
-    saveRDS(seu_merged, file = 'seurat_merged.rds')
+    saveRDS(seu_merged, file = file.path(output_dir, 'seurat_merged.rds'))
   } else if (length(rds_files) == 1) {
     seu_merged <- readRDS(rds_files)
   } else {
@@ -39,7 +47,7 @@ run_scrna_pipeline <- function(
   }
 
   if (do_marker) {
-    find_and_plot_markers(aggr)
+    find_and_plot_markers(aggr, output_dir = output_dir)
   }
 
   if (do_epithelial) {
@@ -47,7 +55,7 @@ run_scrna_pipeline <- function(
     if (!is.null(seu_epi) && "Phase" %in% names(seu_epi@meta.data)) {
       seu_epi <- subset(seu_epi, cells = which(seu_epi$Phase != 'S'))
     }
-    saveRDS(seu_epi, file = 'seurat_epi.rds')
+    saveRDS(seu_epi, file = file.path(output_dir, 'seurat_epi.rds'))
   }
 
   return(seu_epi=seu_epi)
@@ -60,7 +68,7 @@ run_scrna_pipeline <- function(
 #' @return Merged Seurat object
 #' @export
 merge_seurat_objects <- function(rds_files, sample_list=NULL, condition_list = NULL) {
-  library(Seurat)
+
   modifyBarcodeSuffix <- function(barcodes, cell.suffix) {
     bc_has_suffix = (length(grep("-", barcodes)) > 0)
     if (cell.suffix == 'N' && bc_has_suffix) {
@@ -102,7 +110,7 @@ merge_seurat_objects <- function(rds_files, sample_list=NULL, condition_list = N
 #' @return Processed Seurat object
 #' @export
 process_merged_seurat <- function(seu_merged, dims.reduce=20, cluster.res=1) {
-  library(Seurat)
+
   aggr <- seu_merged %>%
     SCTransform(return.only.var.genes=FALSE) %>%
     RunPCA(algorithm=4, approx=F) %>%
@@ -123,22 +131,28 @@ process_merged_seurat <- function(seu_merged, dims.reduce=20, cluster.res=1) {
 #' @importFrom viridis scale_fill_viridis
 #' @importFrom ggplot2 theme element_text
 #' @param aggr Processed Seurat object
+#' @param output_dir Directory to save output files, default is current working directory
 #' @return NULL
 #' @export
-find_and_plot_markers <- function(aggr) {
-  library(Seurat)
-  library(ggplot2)
+find_and_plot_markers <- function(aggr, output_dir = ".") {
+
+  # Create output directory if it doesn't exist
+  if (!dir.exists(output_dir)) {
+    dir.create(output_dir, recursive = TRUE)
+  }
+  
   markers_RNA <- FindAllMarkers(aggr, assay = "RNA", min.pct = 0.25, logfc.threshold = 0.25)
-  write.csv(markers_RNA, file = "markers_RNA.csv")
+  write.csv(markers_RNA, file = file.path(output_dir, "markers_RNA.csv"))
   top20 <- markers_RNA %>% group_by(cluster) %>% top_n(n = 20, wt = avg_log2FC)
-  write.csv(top20, file = "top20_markers_RNA.csv")
+  write.csv(top20, file = file.path(output_dir, "top20_markers_RNA.csv"))
   top5 <- markers_RNA %>% group_by(cluster) %>% top_n(n = 5, wt = avg_log2FC)
-  pdf("top5_cluster.pdf")
+  pdf(file.path(output_dir, "top5_cluster.pdf"))
   DoHeatmap(aggr, features = top5$gene) + scale_fill_viridis(option = "D") + theme(axis.text.y = element_text(size = 6))
   dev.off()
 }
 
 #' Extract epithelial cells and rerun Seurat pipeline
+#' @importFrom Seurat AddModuleScore
 #' @importFrom dplyr filter arrange select %>%
 #' @importFrom Seurat SCTransform RunPCA RunUMAP FindNeighbors FindClusters BuildClusterTree
 #' @param seu_merged Processed Seurat object

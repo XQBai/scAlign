@@ -1,8 +1,8 @@
+utils::globalVariables(c("chr", "bin"))
+
 #' Plot subclonal CNV heatmap for scDNA-seq data
-#'
 #' This function generates a subclonal CNV heatmap from a Seurat object and segment location information.
 #' It supports plotting with or without noise/normal cells, and saves the heatmap as a PDF.
-#'
 #' @param seurat_obj A Seurat object with subclones and celltype annotation
 #' @param scdna_matrix_locs A data.frame of segment locations (e.g., read from scdna_matrix_locs.rds)
 #' @param output_pdf Output PDF file name (default 'Subclones_heatmap.pdf')
@@ -86,8 +86,31 @@ plot_subclonal_heatmap <- function(
   invisible(mat)
 }
 
+#' Sort subclones based on hierarchical clustering order
+#' This function reorders subclones in a matrix and their corresponding labels
+#' based on the order from hierarchical clustering results.
+#' @param mat A matrix of CNV values (cells x features) to be reordered
+#' @param labels A data.frame with a 'cluster' column containing subclone labels
+#' @param hc A hierarchical clustering object (e.g., from hclust) with 'order' and 'labels' components
+#' @return A list containing:
+#'   \item{mat}{The reordered matrix with cells sorted by subclone order}
+#'   \item{labels}{The reordered labels data.frame with cluster factor levels set to match the new order}
+#' @export
+Sort_subclones <- function(mat, labels, hc){
+  # order <- paste0('C', hc$order)
+  order <- hc$labels[hc$order]
+  index <- c()
+  for (i in order){
+    index_sub <- which(labels$cluster == i)
+    index <- c(index, index_sub)
+  }
+  tmp_cluster <- labels$cluster[index]
+  labels$cluster <- factor(tmp_cluster, levels = unique(tmp_cluster))
+  mat <- mat[index, ]
+  return(list(mat, labels))
+}
+
 #' Sort cells within a subclone by correlation
-#'
 #' This function sorts cells within a subclone based on a correlation vector.
 #' @importFrom dplyr %>% arrange
 #' @param scdna_matrix A matrix of CNV values (features x cells)
